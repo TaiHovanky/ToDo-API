@@ -1,8 +1,18 @@
 var Sequelize = require('sequelize');
-var sequelize = new Sequelize(undefined, undefined, undefined, {
-    'dialect': 'sqlite',
-    'storage': __dirname + '/data/dev-todo-api.sqlite'
-}); //when we run sync, sequelize will create the appropriate tables
+var env = process.env.NODE_ENV || 'development';   //all environment variables are in this object
+var sequelize;
+
+if(env ==="production"){ // this is used to connect to PostGres in Heroku
+    sequelize = new Sequelize(process.env.DATABASE_URL, {
+        dialect: 'postgres'
+    });
+} else {
+    sequelize = new Sequelize(undefined, undefined, undefined, {
+        'dialect': 'sqlite',
+        'storage': __dirname + '/data/dev-todo-api.sqlite'
+    }); //when we run sync, sequelize will create the appropriate tables
+} // this is used to connect to PostGres in Heroku
+
 
 var db = {}; //we'll export this db from db.js
 
