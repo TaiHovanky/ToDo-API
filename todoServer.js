@@ -36,17 +36,26 @@ app.get('/todos', function(req, res){
 
 app.get('/todos/:id', function(req, res){
     var todoId = parseInt(req.params.id, 10);
-    var matchedTodo = _.findWhere(todos, {id: todoId}); //searches through todo array for element that has an id equal to todoId
-    //todos.forEach(function(todo){
+    db.todo.findById(todoId).then(function(todo){
+        if(!!todo){  //objects are truthy, two !! flips it to a truthy value
+            res.json(todo.toJSON());
+        } else {
+            res.status(404).send();
+        }        
+    }, function(e){
+        res.status(500).send();
+    });
+    //var matchedTodo = _.findWhere(todos, {id: todoId}); //searches through todo array for element that has an id equal to todoId
+    //todos.forEach(function(todo){ <-- replaced this section during refactoring with underscore
         //if(todo.id === todoId){
             //matchedTodo = todo;
         //} 
     //});  <--replaced by the underscore function _.findWhere
-    if(matchedTodo){
-        res.json(matchedTodo);
-    } else {
-        res.status(404).send();
-    }
+    //if(matchedTodo){
+        //res.json(matchedTodo);
+    //} else {
+        //res.status(404).send();
+    //}
 
 });
 
