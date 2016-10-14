@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var _ = require('underscore');
+var db = require('./db.js');
 var app = express();
 
 var port = process.env.PORT || 5000;
@@ -51,15 +52,21 @@ app.get('/todos/:id', function(req, res){
 
 //POST will resemble get /todos. There's no :id since the id is generated after the POST
 app.post('/todos', function(req, res){
-    var body = _.pick(req.body, 'description', 'completed'); //use _.pick to remove extraneous data from req.body object
-    if(!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0){
-        return res.status(400).send();
-    } //if the completed field isn't a Boolean or if the description isn't a string, return a 400 status
+    var body = _.pick(req.body, 'description', 'completed');
+    db.todo.create(body).then(function(todo){
+        res.json(todo.toJSON()); //there's a lot of other data that needs to be converted toJSON
+    }, function(e){
+        res.status(400).json(e);
+    });
+    //var body = _.pick(req.body, 'description', 'completed'); //use _.pick to remove extraneous data from req.body object
+    //if(!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0){
+        //return res.status(400).send();
+    //} //if the completed field isn't a Boolean or if the description isn't a string, return a 400 status
     //the .trim removes the spaces and so if without its spaces, the entry's length is 0, we get the error
-    body.description = body.description.trim(); //remove whitespaces before and after the description string
-    body.id = todoNextId++;
-    todos.push(body);
-    res.json(body);
+    //body.description = body.description.trim(); //remove whitespaces before and after the description string
+    //body.id = todoNextId++;
+    //todos.push(body);
+    //res.json(body);
 });
 
 //Delete /todos/:id
@@ -101,7 +108,9 @@ app.put('/todos/:id', function(req, res){
     res.json(matchedTodo);
 });
 
-
-app.listen(port, function(){
-    console.log('express listening on port '+ port);
+db.sequelize.sync().then(function(){
+    app.listen(port, function(){
+        console.log('express listening on port '+ port);
+    });
 });
+
