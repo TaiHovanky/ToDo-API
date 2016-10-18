@@ -15,5 +15,13 @@ module.exports = function (sequelize, DateTypes) {
                 len: [7, 100] //look in Validate Regex
             }
         } //don't need a notEmpty for a Boolean since you it has to be true or false
+    }, {
+        hooks: {
+            beforeValidate: function(user, options){
+                if(typeof user.email === 'string'){
+                    user.email = user.email.toLowerCase();
+                }
+            }
+        }
     });
 }
