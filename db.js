@@ -18,6 +18,7 @@ var db = {}; //we'll export this db from db.js
 
 //need to retrieve models
 db.todo = sequelize.import(__dirname + '/models/todo.js');  //sequelize.import lets you load in models from other files
+db.user = sequelize.import(__dirname + '/models/user.js');
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 module.exports = db;

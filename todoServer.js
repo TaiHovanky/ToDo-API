@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var _ = require('underscore');
 var db = require('./db.js');
+//var user = require('./user.js');
 var app = express();
 
 var port = process.env.PORT || 5000;
@@ -160,6 +161,15 @@ app.put('/todos/:id', function(req, res){
     });
     //_.extend(matchedTodo, attributes); //don't need to explicitly update array - objects are passed by reference
     //res.json(matchedTodo); got rid of this during the sequelize refactor
+});
+
+app.post('/users', function(req, res){
+    var body = _.pick(req.body, 'email', 'password');
+    db.user.create(body).then(function(user){
+        res.json(user.toJSON());
+    }, function(e){
+        res.status(400).json(e);
+    });
 });
 
 db.sequelize.sync().then(function(){
